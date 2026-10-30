@@ -9,3 +9,4 @@ for (const [source, destination] of [
   ['node_modules/jspdf/LICENSE', 'jspdf.LICENSE.txt']
 ]) await copyFile(new URL(source, root), new URL(`vendor/${destination}`, root));
 console.log(`Bibliotecas locais preparadas em ${fileURLToPath(new URL('vendor/', root))}`);
+await import('./styles.mjs');

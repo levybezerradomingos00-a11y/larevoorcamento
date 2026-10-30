@@ -112,3 +112,27 @@ test('falha no carregamento do PDF exibe erro e permite tentar novamente', async
   await expect(page.locator('#pdfButton')).toBeEnabled();
   await expect(page.locator('#clientName')).toBeEnabled();
 });
+
+test('exporta mesmo com folha de estilos de outra origem injetada na prévia', async ({ page }, testInfo) => {
+  await page.route('https://preview-styles.invalid/extra.css', route => route.fulfill({
+    status: 200, contentType: 'text/css', body: ':root { --preview-marker: 1; }'
+  }));
+  await page.goto('/');
+  const blocked = await page.evaluate(async () => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://preview-styles.invalid/extra.css';
+    await new Promise((resolve, reject) => { link.onload = resolve; link.onerror = reject; document.head.append(link); });
+    try { void link.sheet.cssRules; return false; } catch (error) { return error.name === 'SecurityError'; }
+  });
+  expect(blocked).toBe(true);
+  const downloaded = page.waitForEvent('download', { timeout: 10000 });
+  await page.locator('#pdfButton').click();
+  const download = await downloaded;
+  const path = testInfo.outputPath('proposta-css-bloqueado.pdf');
+  await download.saveAs(path);
+  const bytes = await fs.readFile(path);
+  expect(bytes.length).toBeGreaterThan(100000);
+  expect((await PDFDocument.load(bytes)).getPageCount()).toBe(3);
+  await expect(page.locator('#editStatus')).toContainText('PDF gerado');
+});

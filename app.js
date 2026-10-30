@@ -57,19 +57,9 @@
     update();
   }
 
-  // Reuse the print rules instead of maintaining a second PDF layout.
-  function printRules() {
-    const rules = [];
-    for (const sheet of document.styleSheets) {
-      for (const rule of sheet.cssRules) {
-        if (rule.type === CSSRule.MEDIA_RULE && /\bprint\b/.test(rule.conditionText)) {
-          rules.push(...Array.from(rule.cssRules, child => child.cssText));
-        }
-      }
-    }
-    return rules.join('\n');
-  }
   async function exportDocument() {
+    const styles = window.LarevoStyles;
+    if (!styles?.screen || !styles?.print) throw new Error('Os estilos de exportação não carregaram. Recarregue a página.');
     const frame = document.createElement('iframe');
     frame.title = 'Preparação do PDF';
     frame.setAttribute('aria-hidden', 'true');
@@ -79,13 +69,16 @@
       frame.onload = resolve;
       frame.onerror = () => reject(new Error('Não foi possível preparar as páginas.'));
     });
-    const head = document.head.cloneNode(true);
-    head.querySelectorAll('script, title').forEach(node => node.remove());
+    // Only our prepared styles enter the PDF, never styles injected by a preview or extension.
+    const head = document.createElement('head');
+    const charset = document.createElement('meta');
+    charset.setAttribute('charset', 'utf-8');
+    head.append(charset);
     const base = document.createElement('base');
     base.href = document.baseURI;
     head.prepend(base);
     const style = document.createElement('style');
-    style.textContent = printRules();
+    style.textContent = `${styles.screen}\n${styles.print}`;
     head.append(style);
     frame.srcdoc = `<!doctype html><html lang="pt-BR">${head.outerHTML}<body>${document.querySelector('main').outerHTML}</body></html>`;
     document.body.append(frame);

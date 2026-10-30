@@ -28,6 +28,7 @@ O site é estático e não exige servidor Node em produção, banco de dados ou 
 ```text
 index.html
 styles.css
+styles.js
 app.js
 vendor/
 ```
@@ -37,6 +38,8 @@ As bibliotecas e suas licenças estão incluídas em `vendor/`. Não há carrega
 ## PDF
 
 O download usa html2canvas e jsPDF locais. Cada página é capturada separadamente com o mesmo CSS de impressão e inserida em A4 horizontal, evitando cortes entre páginas. A resolução de captura é 240 dpi. O conteúdo visual é rasterizado: o texto do PDF baixado não é selecionável. O layout não depende do tamanho da tela, inclusive ao baixar pelo celular.
+
+`styles.js` é gerado a partir de `styles.css` e deve ser publicado junto dos demais arquivos. A exportação usa essa cópia dos estilos, sem ler `CSSStyleSheet.cssRules`, que pode ser bloqueado em prévias, extensões e folhas de outra origem. Ao alterar `styles.css`, execute `npm run vendor` e inclua o `styles.js` atualizado na publicação.
 
 Entradas inválidas impedem a geração. O botão mostra o andamento, bloqueia alterações enquanto gera o arquivo e permite tentar novamente se houver falha.
 
@@ -55,10 +58,11 @@ $env:PLAYWRIGHT_CHANNEL = 'msedge'
 npm test
 ```
 
-Os testes cobrem atualização de todos os nomes/valores, centavos, valores zerados, entradas inválidas, paginação e rodapés, download real de três páginas, celular e tratamento de falha nas bibliotecas.
+Os testes cobrem atualização de todos os nomes/valores, centavos, valores zerados, entradas inválidas, paginação e rodapés, download real de três páginas, celular, tratamento de falha nas bibliotecas e exportação com estilos de outra origem bloqueados pelo navegador.
 
 - `index.html`: conteúdo da proposta e campos de edição.
 - `styles.css`: visual, responsividade e regras de impressão.
+- `styles.js`: cópia gerada dos estilos para a exportação isolada.
 - `app.js`: valores, validação e download de PDF.
 - `scripts/vendor.mjs`: copia as versões fixadas das bibliotecas para `vendor/`.
 - `scripts/serve.mjs`: servidor local de revisão.
