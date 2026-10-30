@@ -1,0 +1,21 @@
+{
+  "name": "larevo-orcamento",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Montador de propostas LAREVO HOME com download de PDF em três páginas.",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "vendor": "node scripts/vendor.mjs",
+    "postinstall": "npm run vendor",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "html2canvas": "1.4.1",
+    "jspdf": "4.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "pdf-lib": "1.17.1"
+  },
+  "engines": { "node": ">=20" }
+}
