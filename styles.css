@@ -18,3 +18,4 @@
 
 
 .price-list{padding:0 0 0 13px;margin:17px 0 0;list-style:disc;color:var(--muted)}.price-list li{font-size:12px;line-height:1.6;padding-left:2px}.price-list li+li{margin-top:9px}.price-list li::marker{color:var(--blue);font-size:9px}.total .price-list{color:#c1d2e0}.total .price-list li::marker{color:#91b8eb}@media print{.price-list{margin-top:15px}.price-list li{font-size:12px}.price-list li+li{margin-top:8px}}
+.price-list li.equipment-exclusion{list-style:none;font-size:10px;line-height:1.5;color:#d2d5d9;margin-top:6px}
